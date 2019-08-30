@@ -1,3 +1,6 @@
+mod vec3;
+
+
 fn write(s: &str) {
     print!("{}", s);
 }
