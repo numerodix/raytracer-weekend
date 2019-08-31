@@ -377,8 +377,8 @@ mod tests {
 
     #[test]
     fn make_unit_vector() {
-        let mut v = Vec3::new(0.0, 3.0, 4.0);
-        let result = Vec3::new(0.0, 0.6, 0.8);
+        let mut v = Vec3::new(0.0, 3.0, -4.0);
+        let result = Vec3::new(0.0, 0.6, -0.8);
 
         v.make_unit_vector();
         assert_eq!(result, v);
