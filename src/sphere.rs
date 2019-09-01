@@ -23,8 +23,9 @@ impl Hitable for Sphere {
         let c = Vec3::dot(&oc, &oc) - self.radius * self.radius;
 
         let discriminant = b * b - a * c;
+
         if discriminant > 0.0 {
-            let mut temp = (-b - (b * b - a * c).sqrt()) / a;
+            let mut temp = (-b - discriminant.sqrt()) / a;
             if temp < t_max && temp > t_min {
                 let t = temp;
                 let p = r.point_at_parameter(t);
@@ -32,7 +33,7 @@ impl Hitable for Sphere {
                 return Some(HitRecord::new(t, p, normal));
             }
 
-            temp = (-b + (b * b - a * c).sqrt()) / a;
+            temp = (-b + discriminant.sqrt()) / a;
             if temp < t_max && temp > t_min {
                 let t = temp;
                 let p = r.point_at_parameter(t);
@@ -40,6 +41,7 @@ impl Hitable for Sphere {
                 return Some(HitRecord::new(t, p, normal));
             }
         }
+
         None
     }
 }

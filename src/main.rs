@@ -67,7 +67,6 @@ fn main() {
                 lower_left_corner + u * horizontal + v * vertical,
             );
 
-            let p = r.point_at_parameter(2.0);
             let col = color(&r, &world);
 
             let ir = (255.99 * col[0]) as i32;
