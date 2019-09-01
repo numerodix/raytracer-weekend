@@ -5,8 +5,7 @@ use crate::ray::Ray;
 use crate::vec3::Vec3;
 
 
-fn hit_sphere(center: &Vec3, radius: f32, r: &Ray) -> bool {
-    // compute distance from ray's origin to the center of the sphere
+fn hit_sphere(center: &Vec3, radius: f32, r: &Ray) -> f32 {
     let oc = *r.origin() - *center;
 
     let a = Vec3::dot(r.direction(), r.direction());
@@ -17,13 +16,21 @@ fn hit_sphere(center: &Vec3, radius: f32, r: &Ray) -> bool {
 
     let discriminant = b * b - 4.0f32 * a * c;
 
-    discriminant > 0.0f32
+    match discriminant {
+       d if d < 0.0f32 => -1.0,
+       _ => (-b - discriminant.sqrt()) / (2.0f32 * a),
+    }
 }
 
 fn color(r: &Ray) -> Vec3 {
-    if hit_sphere(&Vec3::new(0.0, 0.0, -1.0), 0.5f32, &r) {
-        // solid red color
-        return Vec3::new(1.0, 0.0, 0.0);
+    let t = hit_sphere(&Vec3::new(0.0, 0.0, -1.0), 0.5f32, &r);
+
+    if t > 0.0f32 {
+        let N = Vec3::unit_vector(
+            &(r.point_at_parameter(t) - Vec3::new(0.0, 0.0, -1.0))
+        );
+
+        return 0.5f32 * Vec3::new(N.x() + 1.0, N.y() + 1.0, N.z() + 1.0);
     }
 
     // r has a direction vector like:           [2.0, 0.4, -2.0]
