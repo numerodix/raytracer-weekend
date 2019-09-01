@@ -48,7 +48,7 @@ impl Vec3 {
     }
 
     pub fn make_unit_vector(&mut self) {
-        let k = 1.0f32 / self.length();
+        let k = 1.0 / self.length();
 
         self.e[0] *= k;
         self.e[1] *= k;
