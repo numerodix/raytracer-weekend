@@ -37,36 +37,6 @@ impl Vec3 {
     }
 
 
-    pub fn mul_factor(self, factor: f32) -> Self {
-        Vec3::new(
-            self.e[0] * factor,
-            self.e[1] * factor,
-            self.e[2] * factor,
-        )
-    }
-
-    pub fn mul_factor_mut(&mut self, factor: f32) {
-        self.e[0] *= factor;
-        self.e[1] *= factor;
-        self.e[2] *= factor;
-    }
-
-    pub fn div_factor(self, factor: f32) -> Self {
-        Vec3::new(
-            self.e[0] / factor,
-            self.e[1] / factor,
-            self.e[2] / factor,
-        )
-    }
-
-    pub fn div_factor_mut(&mut self, factor: f32) {
-        let k = 1.0f32 / factor;
-
-        self.e[0] *= k;
-        self.e[1] *= k;
-        self.e[2] *= k;
-    }
-
     pub fn length(&self) -> f32 {
         self.squared_length().sqrt()
     }
@@ -87,7 +57,7 @@ impl Vec3 {
 
 
     pub fn unit_vector(v: &Vec3) -> Self {
-        v.div_factor(v.length())
+        *v / v.length()
     }
 
     pub fn dot(v1: &Vec3, v2: &Vec3) -> f32 {
@@ -184,12 +154,47 @@ impl Mul for Vec3 {
     }
 }
 
+// multiplication by a float on the right hand side
+impl Mul<f32> for Vec3 {
+    type Output = Self;
+
+    fn mul(self, other: f32) -> Self {
+        Vec3::new(
+            self.e[0] * other,
+            self.e[1] * other,
+            self.e[2] * other,
+        )
+    }
+}
+
+// multiplication by a float on the left hand side
+impl Mul<Vec3> for f32 {
+    type Output = Vec3;
+
+    fn mul(self, other: Vec3) -> Self::Output {
+        Vec3::new(
+            self * other.e[0],
+            self * other.e[1],
+            self * other.e[2],
+        )
+    }
+}
+
 // assigning multiplication
 impl MulAssign for Vec3 {
     fn mul_assign(&mut self, other: Self) {
         self.e[0] *= other.e[0];
         self.e[1] *= other.e[1];
         self.e[2] *= other.e[2];
+    }
+}
+
+// assigning multiplication by a float on the right hand side
+impl MulAssign<f32> for Vec3 {
+    fn mul_assign(&mut self, other: f32) {
+        self.e[0] *= other;
+        self.e[1] *= other;
+        self.e[2] *= other;
     }
 }
 
@@ -206,12 +211,34 @@ impl Div for Vec3 {
     }
 }
 
+// division by a float on the right hand side
+impl Div<f32> for Vec3 {
+    type Output = Self;
+
+    fn div(self, other: f32) -> Self {
+        Vec3::new(
+            self.e[0] / other,
+            self.e[1] / other,
+            self.e[2] / other,
+        )
+    }
+}
+
 // assigning division
 impl DivAssign for Vec3 {
     fn div_assign(&mut self, other: Self) {
         self.e[0] /= other.e[0];
         self.e[1] /= other.e[1];
         self.e[2] /= other.e[2];
+    }
+}
+
+// assigning division by a float on the right hand side
+impl DivAssign<f32> for Vec3 {
+    fn div_assign(&mut self, other: f32) {
+        self.e[0] /= other;
+        self.e[1] /= other;
+        self.e[2] /= other;
     }
 }
 
@@ -299,6 +326,15 @@ mod tests {
     }
 
     #[test]
+    fn multiplication_by_float_operator() {
+        let v = Vec3::new(1.0, 2.0, 3.0);
+        let result = Vec3::new(2.0, 4.0, 6.0);
+
+        assert_eq!(result, v * 2.0);
+        assert_eq!(result, 2.0 * v);
+    }
+
+    #[test]
     fn multiplication_assign_operator() {
         let mut v1 = Vec3::new(1.0, 2.0, 3.0);
         let v2 = Vec3::new(1.0, 2.0, 3.0);
@@ -309,12 +345,29 @@ mod tests {
     }
 
     #[test]
+    fn multiplication_by_float_assign_operator() {
+        let mut v = Vec3::new(1.0, 2.0, 3.0);
+        let result = Vec3::new(2.0, 4.0, 6.0);
+
+        v *= 2.0;
+        assert_eq!(result, v);
+    }
+
+    #[test]
     fn division_operator() {
         let v1 = Vec3::new(1.0, 2.0, 4.0);
         let v2 = Vec3::new(2.0, 2.0, 2.0);
         let quotient = Vec3::new(0.5, 1.0, 2.0);
 
         assert_eq!(quotient, v1 / v2);
+    }
+
+    #[test]
+    fn division_by_float_operator() {
+        let v = Vec3::new(2.0, 4.0, 6.0);
+        let result = Vec3::new(1.0, 2.0, 3.0);
+
+        assert_eq!(result, v / 2.0);
     }
 
     #[test]
@@ -328,37 +381,12 @@ mod tests {
     }
 
     #[test]
-    fn mul_factor() {
-        let v = Vec3::new(1.0, 2.0, 3.0);
-        let result = Vec3::new(2.0, 4.0, 6.0);
+    fn division_by_float_assign_operator() {
+        let mut v = Vec3::new(1.0, 2.0, 4.0);
+        let quotient = Vec3::new(0.5, 1.0, 2.0);
 
-        assert_eq!(result, v.mul_factor(2.0));
-    }
-
-    #[test]
-    fn mul_factor_mut() {
-        let mut v = Vec3::new(1.0, 2.0, 3.0);
-        let result = Vec3::new(2.0, 4.0, 6.0);
-
-        v.mul_factor_mut(2.0);
-        assert_eq!(result, v);
-    }
-
-    #[test]
-    fn div_factor() {
-        let v = Vec3::new(2.0, 3.0, 9.0);
-        let result = Vec3::new(1.0, 1.5, 4.5);
-
-        assert_eq!(result, v.div_factor(2.0));
-    }
-
-    #[test]
-    fn div_factor_mut() {
-        let mut v = Vec3::new(2.0, 3.0, 9.0);
-        let result = Vec3::new(1.0, 1.5, 4.5);
-
-        v.div_factor_mut(2.0);
-        assert_eq!(result, v);
+        v /= 2.0;
+        assert_eq!(quotient, v);
     }
 
     #[test]

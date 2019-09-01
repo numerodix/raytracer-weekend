@@ -21,7 +21,7 @@ impl Ray {
     }
 
     pub fn point_at_parameter(&self, t: f32) -> Vec3 {
-        self.a + self.b.mul_factor(t)
+        self.a + t * self.b
     }
 }
 

@@ -20,7 +20,7 @@ fn color(r: &Ray) -> Vec3 {
     // [0.5, 0.7, 1.0] represents light blue
 
     // blend: white at intensity 1-t *with* blue at intensity t
-    Vec3::new(1.0, 1.0, 1.0).mul_factor(1.0f32 - t) + Vec3::new(0.5, 0.7, 1.0).mul_factor(t)
+    (1.0f32 - t) * Vec3::new(1.0, 1.0, 1.0) + t * Vec3::new(0.5, 0.7, 1.0)
 }
 
 
@@ -52,7 +52,7 @@ fn main() {
 
             let r = Ray::new(
                 origin,
-                lower_left_corner + horizontal.mul_factor(u) + vertical.mul_factor(v),
+                lower_left_corner + u * horizontal + v * vertical,
             );
             let col = color(&r);
 
