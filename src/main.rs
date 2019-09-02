@@ -1,9 +1,11 @@
+mod camera;
 mod hitable;
 mod hitable_list;
 mod ray;
 mod sphere;
 mod vec3;
 
+use crate::camera::Camera;
 use crate::hitable::Hitable;
 use crate::hitable_list::HitableList;
 use crate::ray::Ray;
@@ -40,33 +42,20 @@ fn main() {
 
     write(&format!("P3\n{} {}\n255\n", nx, ny));
 
-    // screen coordinate
-    let lower_left_corner = Vec3::new(-2.0, -1.0, -1.0);
-    // screen width
-    let horizontal = Vec3::new(4.0, 0.0, 0.0);
-    // screen height
-    let vertical = Vec3::new(0.0, 2.0, 0.0);
-
-    // position of the camera / eye
-    let origin = Vec3::new(0.0, 0.0, 0.0);
-
     let sphere1 = Sphere::new(Vec3::new(0.0, 0.0, -1.0), 0.5);
     let sphere2 = Sphere::new(Vec3::new(0.0, -100.5, -1.0), 100.0);
     let world = HitableList::new(vec![
         Box::new(sphere1),
         Box::new(sphere2),
     ]);
+    let cam = Camera::new();
 
     for j in (0 .. ny - 1).rev() {
         for i in 0 .. nx {
             let u = i as f32 / nx as f32;
             let v = j as f32 / ny as f32;
 
-            let r = Ray::new(
-                origin,
-                lower_left_corner + u * horizontal + v * vertical,
-            );
-
+            let r = cam.get_ray(u, v);
             let col = color(&r, &world);
 
             let ir = (255.99 * col[0]) as i32;
