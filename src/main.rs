@@ -10,7 +10,7 @@ use crate::camera::Camera;
 use crate::hitable::Hitable;
 use crate::hitable_list::HitableList;
 use crate::ray::Ray;
-use crate::random::RandomGenerator;
+use crate::random::rand48;
 use crate::sphere::Sphere;
 use crate::vec3::Vec3;
 
@@ -52,15 +52,14 @@ fn main() {
         Box::new(sphere2),
     ]);
     let cam = Camera::new();
-    let mut random = RandomGenerator::new();
 
     for j in (0 .. ny - 1).rev() {
         for i in 0 .. nx {
             let mut col = Vec3::new(0.0, 0.0, 0.0);
 
             for _ in 0..ns {
-                let u = (i as f32 * random.next_c()) / nx as f32;
-                let v = (j as f32 * random.next_c()) / ny as f32;
+                let u = (i as f32 * rand48()) / nx as f32;
+                let v = (j as f32 * rand48()) / ny as f32;
                 let r = cam.get_ray(u, v);
                 let p = r.point_at_parameter(2.0);
                 col += color(&r, &world);
