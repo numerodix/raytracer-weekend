@@ -1,12 +1,16 @@
+mod camera;
 mod hitable;
 mod hitable_list;
+mod random;
 mod ray;
 mod sphere;
 mod vec3;
 
+use crate::camera::Camera;
 use crate::hitable::Hitable;
 use crate::hitable_list::HitableList;
 use crate::ray::Ray;
+use crate::random::RandomGenerator;
 use crate::sphere::Sphere;
 use crate::vec3::Vec3;
 
@@ -37,18 +41,9 @@ fn write(s: &str) {
 fn main() {
     let nx: i32 = 200;
     let ny: i32 = 100;
+    let ns: i32 = 100;
 
     write(&format!("P3\n{} {}\n255\n", nx, ny));
-
-    // screen coordinate
-    let lower_left_corner = Vec3::new(-2.0, -1.0, -1.0);
-    // screen width
-    let horizontal = Vec3::new(4.0, 0.0, 0.0);
-    // screen height
-    let vertical = Vec3::new(0.0, 2.0, 0.0);
-
-    // position of the camera / eye
-    let origin = Vec3::new(0.0, 0.0, 0.0);
 
     let sphere1 = Sphere::new(Vec3::new(0.0, 0.0, -1.0), 0.5);
     let sphere2 = Sphere::new(Vec3::new(0.0, -100.5, -1.0), 100.0);
@@ -56,18 +51,22 @@ fn main() {
         Box::new(sphere1),
         Box::new(sphere2),
     ]);
+    let cam = Camera::new();
+    let mut random = RandomGenerator::new();
 
     for j in (0 .. ny - 1).rev() {
         for i in 0 .. nx {
-            let u = i as f32 / nx as f32;
-            let v = j as f32 / ny as f32;
+            let mut col = Vec3::new(0.0, 0.0, 0.0);
 
-            let r = Ray::new(
-                origin,
-                lower_left_corner + u * horizontal + v * vertical,
-            );
+            for _ in 0..ns {
+                let u = (i as f32 * random.next()) / nx as f32;
+                let v = (j as f32 * random.next()) / ny as f32;
+                let r = cam.get_ray(u, v);
+                let p = r.point_at_parameter(2.0);
+                col += color(&r, &world);
+            }
 
-            let col = color(&r, &world);
+            col /= ns as f32;
 
             let ir = (255.99 * col[0]) as i32;
             let ig = (255.99 * col[1]) as i32;
