@@ -59,8 +59,8 @@ fn main() {
             let mut col = Vec3::new(0.0, 0.0, 0.0);
 
             for _ in 0..ns {
-                let u = (i as f32 * random.next()) / nx as f32;
-                let v = (j as f32 * random.next()) / ny as f32;
+                let u = (i as f32 * random.next_c()) / nx as f32;
+                let v = (j as f32 * random.next_c()) / ny as f32;
                 let r = cam.get_ray(u, v);
                 let p = r.point_at_parameter(2.0);
                 col += color(&r, &world);

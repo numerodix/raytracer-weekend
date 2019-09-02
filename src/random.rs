@@ -2,6 +2,11 @@ use rand;
 use rand::Rng;
 
 
+extern "C" {
+    fn drand48() -> f64;
+}
+
+
 pub struct RandomGenerator {
     rng: rand::rngs::ThreadRng,
 }
@@ -25,5 +30,12 @@ impl RandomGenerator {
         assert!(val < 1.0);
 
         val
+    }
+
+    pub fn next_c(&self) -> f32 {
+        let val = unsafe {
+            drand48()
+        };
+        val as f32
     }
 }
